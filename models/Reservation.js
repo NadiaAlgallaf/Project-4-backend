@@ -37,6 +37,11 @@ const reservationSchema = new mongoose.Schema(
       enum: {
         values: ['Pending', 'Approved', 'Ready', 'Collected', 'Rejected']
       }
+    },
+
+    createdAt: {
+      type: Date,
+      required: true
     }
   },
   { timestamps: true }
