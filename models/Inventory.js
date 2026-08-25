@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
-const inventorySchema = new moongose.Schema(
+const inventorySchema = new mongoose.Schema(
   {
     pharmacy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,9 +12,16 @@ const inventorySchema = new moongose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Medicine',
       required: true
+    },
+
+    stock: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0
     }
   },
-  { timeStamps: true }
+  { timestamps: true }
 )
 
 const Inventory = mongoose.model('Inventory', inventorySchema)

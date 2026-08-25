@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const reservationSchema = new mongoose.Schema(
   {
@@ -23,13 +23,13 @@ const reservationSchema = new mongoose.Schema(
     prescription: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Prescription',
-      required: true
+      required: false
     },
 
     quantity: {
       type: Number,
       required: true,
-      trim: true
+      min: 1
     },
 
     status: {
