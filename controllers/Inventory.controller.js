@@ -41,7 +41,33 @@ async function getMyInventory(req, res) {
   }
 }
 
+async function deleteMedicine(req, res) {
+  try {
+    const inventory = await Inventory.findOneAndDelete({
+      _id: req.params.id,
+      pharmacy: req.user._id
+    })
+
+    if (!inventory) {
+      return res.status(404).json({
+        message: 'Medicine not found in inventory.'
+      })
+    }
+
+    return res.status(200).json({
+      message: 'Medicine removed from inventory.'
+    })
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 module.exports = {
   addMedicine,
-  getMyInventory
+  getMyInventory,
+  deleteMedicine
 }
