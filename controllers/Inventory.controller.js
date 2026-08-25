@@ -25,6 +25,23 @@ async function addMedicine(req, res) {
   }
 }
 
+async function getMyInventory(req, res) {
+  try {
+    const inventory = await Inventory.find({
+      pharmacy: req.user._id
+    }).populate('medicine')
+
+    return res.status(200).json(inventory)
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 module.exports = {
-  addMedicine
+  addMedicine,
+  getMyInventory
 }
