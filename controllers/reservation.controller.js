@@ -65,8 +65,44 @@ async function getPharmacyReservations(req, res) {
   }
 }
 
+async function updateReservationStatus(req, res) {
+  try {
+    const { status } = req.body
+
+    const reservation = await Reservation.findOne({
+      _id: req.params.id,
+      pharmacy: req.user._id
+    })
+
+    if (!reservation) {
+      return res.status(404).json({
+        message: 'Reservation not found.'
+      })
+    }
+
+    reservation.status = status
+
+    await reservation.save()
+
+    return res.status(200).json(reservation)
+  } catch (err) {
+    console.error(err)
+
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({
+        message: err.message
+      })
+    }
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 module.exports = {
   createReservation,
   getMyReservations,
-  getPharmacyReservations
+  getPharmacyReservations,
+  updateReservationStatus
 }
