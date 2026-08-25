@@ -1,53 +1,19 @@
-import Pharmacy from '../models/Pharmacy.js'
-import Medicine from '../models/Medicine.js'
+const Pharmacy = require("../models/Pharmacy");
 
-// Create Pharmacy
-export const createPharmacy = async (req, res) => {
+async function getAllPharmacies(req, res) {
   try {
-    req.body.createdBy = req.user._id
+    const pharmacies = await Pharmacy.find();
 
-    const pharmacy = await Pharmacy.create(req.body)
+    return res.status(200).json(pharmacies);
+  } catch (err) {
+    console.error(err);
 
-    res.status(201).json({
-      success: true,
-      pharmacy
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    })
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 }
 
-// GET all Pharmacies + filter Pharmacies
-export const getAllPharmacies = async (req, res) => {
-  try {
-    const { jobCategory, jobType } = req.query
-
-    const filter = {}
-
-    if (jobCategory) {
-      filter.jobCategory = jobCategory
-    }
-
-    if (jobType) {
-      filter.jobType = jobType
-    }
-
-    const jobs = await Job.find(filter).populate("createdBy","firstName lastName companyLogo").sort("-createdAt")
-
-    res.status(200).json({
-      success: true,
-      count: jobs.length,
-      jobs
-    })
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    })
-  }
-}
-
-
+module.exports = {
+  getAllPharmacies,
+};
