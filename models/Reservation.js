@@ -38,11 +38,6 @@ const reservationSchema = new mongoose.Schema(
         values: ['Pending', 'Approved', 'Ready', 'Collected', 'Rejected']
       },
       default: 'Pending'
-    },
-
-    createdAt: {
-      type: Date,
-      required: true
     }
   },
   { timestamps: true }
