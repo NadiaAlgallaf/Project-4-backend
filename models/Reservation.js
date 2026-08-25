@@ -34,8 +34,14 @@ const reservationSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ['Pending', 'Approved', 'Ready', 'Collected', 'Rejected'],
-      default: 'Pending'
+      enum: {
+        values: ['Pending', 'Approved', 'Ready', 'Collected', 'Rejected']
+      }
+    },
+
+    createdAt: {
+      type: Date,
+      required: true
     }
   },
   { timestamps: true }
