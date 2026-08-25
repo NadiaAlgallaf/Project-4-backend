@@ -36,7 +36,8 @@ const reservationSchema = new mongoose.Schema(
       type: String,
       enum: {
         values: ['Pending', 'Approved', 'Ready', 'Collected', 'Rejected']
-      }
+      },
+      default: 'Pending'
     },
 
     createdAt: {
