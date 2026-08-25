@@ -8,6 +8,7 @@ const cors = require('cors')
 // Routes Import
 const authRoutes = require('./routes/auth.routes')
 const pharmaciesRoutes = require('./routes/pharmacies.routes')
+const medicineRoutes = require("./routes/medicines.routes");
 
 const dns = require("dns")
 dns.setServers(["8.8.8.8", "1.1.1.1"])
@@ -26,6 +27,7 @@ app.use(morgan('dev'))
 // Routes
 app.use('/auth',authRoutes)
 app.use('/pharmacies', pharmaciesRoutes)
+app.use("/medicines", medicineRoutes);
 
 
 
