@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const medicineSchema = new mongoose.Schema(
   {
@@ -23,18 +23,13 @@ const medicineSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
-      trim: true
-    },
-
-    stock: {
-      type: Number,
-      required: true,
-      trim: true
+      min: 0
     },
 
     requiresPrescription: {
       type: Boolean,
-      required: true
+      required: true,
+      default: false
     }
   },
   { timestamps: true }
