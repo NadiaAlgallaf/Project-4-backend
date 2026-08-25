@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth.routes')
 const pharmaciesRoutes = require('./routes/pharmacies.routes')
 const medicineRoutes = require('./routes/medicines.routes')
 const inventoryRoutes = require('./routes/inventory.routes')
+const reservationRoutes = require('./routes/reservation.routes')
 
 const dns = require('dns')
 dns.setServers(['8.8.8.8', '1.1.1.1'])
@@ -28,5 +29,6 @@ app.use('/auth', authRoutes)
 app.use('/pharmacies', pharmaciesRoutes)
 app.use('/medicines', medicineRoutes)
 app.use('/inventory', inventoryRoutes)
+app.use('/reservations', reservationRoutes)
 
 module.exports = app
