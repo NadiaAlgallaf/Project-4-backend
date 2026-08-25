@@ -100,9 +100,35 @@ async function updateReservationStatus(req, res) {
   }
 }
 
+async function cancelReservation(req, res) {
+  try {
+    const reservation = await Reservation.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user._id
+    })
+
+    if (!reservation) {
+      return res.status(404).json({
+        message: 'Reservation not found.'
+      })
+    }
+
+    return res.status(200).json({
+      message: 'Reservation cancelled successfully.'
+    })
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 module.exports = {
   createReservation,
   getMyReservations,
   getPharmacyReservations,
-  updateReservationStatus
+  updateReservationStatus,
+  cancelReservation
 }
