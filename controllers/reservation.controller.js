@@ -46,7 +46,27 @@ async function getMyReservations(req, res) {
   }
 }
 
+async function getPharmacyReservations(req, res) {
+  try {
+    const reservations = await Reservation.find({
+      pharmacy: req.user._id
+    })
+      .populate('user')
+      .populate('medicine')
+      .populate('prescription')
+
+    return res.status(200).json(reservations)
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 module.exports = {
   createReservation,
-  getMyReservations
+  getMyReservations,
+  getPharmacyReservations
 }
