@@ -1,4 +1,5 @@
 const Reservation = require('../models/Reservation')
+const Prescription = require('../models/Prescription')
 
 async function createReservation(req, res) {
   try {
@@ -125,10 +126,52 @@ async function cancelReservation(req, res) {
   }
 }
 
+async function uploadPrescription(req, res) {
+  try {
+    const { imageUrl } = req.body
+
+    if (!imageUrl) {
+      return res.status(400).json({
+        message: 'Prescription image is required.'
+      })
+    }
+
+    const reservation = await Reservation.findOne({
+      _id: req.params.id,
+      user: req.user._id
+    })
+
+    if (!reservation) {
+      return res.status(404).json({
+        message: 'Reservation not found.'
+      })
+    }
+
+    const prescription = await Prescription.create({
+      user: req.user._id,
+      imageUrl,
+      uploadDate: new Date(),
+      reservation: reservation._id
+    })
+
+    reservation.prescription = prescription._id
+    await reservation.save()
+
+    return res.status(201).json(prescription)
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 module.exports = {
   createReservation,
   getMyReservations,
   getPharmacyReservations,
   updateReservationStatus,
-  cancelReservation
+  cancelReservation,
+  uploadPrescription
 }
