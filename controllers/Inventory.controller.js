@@ -21,9 +21,20 @@ async function addMedicine(req, res) {
       })
     }
 
+    const existingInventory = await Inventory.findOne({
+  pharmacy: pharmacy._id,
+  medicine
+})
+
+if (existingInventory) {
+  return res.status(409).json({
+    message: 'Medicine already exists in inventory.'
+  })
+}
     const inventory = await Inventory.create({
       pharmacy: pharmacy._id,
-      medicine
+      medicine,
+      stock
     })
 
     return res.status(201).json(inventory)
