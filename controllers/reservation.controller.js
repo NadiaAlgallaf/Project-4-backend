@@ -141,6 +141,30 @@ async function updateReservationStatus(req, res) {
       })
     }
 
+    // Only decrease stock when approving a pending reservation
+    if (status === 'Approved' && reservation.status !== 'Approved') {
+      const inventory = await Inventory.findOne({
+        pharmacy: pharmacy._id,
+        medicine: reservation.medicine
+      })
+
+      if (!inventory) {
+        return res.status(404).json({
+          message: 'Medicine is not available in inventory.'
+        })
+      }
+
+      if (inventory.stock < reservation.quantity) {
+        return res.status(400).json({
+          message: `Only ${inventory.stock} item(s) available.`
+        })
+      }
+
+      inventory.stock -= reservation.quantity
+
+      await inventory.save()
+    }
+
     reservation.status = status
 
     await reservation.save()
