@@ -1,5 +1,7 @@
 const Reservation = require('../models/Reservation')
 const Prescription = require('../models/Prescription')
+const Inventory = require('../models/Inventory')
+const Pharmacy = require('../models/Pharmacy')
 
 async function createReservation(req, res) {
   try {
@@ -8,6 +10,37 @@ async function createReservation(req, res) {
     if (!pharmacy || !medicine || !quantity) {
       return res.status(400).json({
         message: 'Pharmacy, medicine, and quantity are required.'
+      })
+    }
+
+    if (quantity < 1) {
+      return res.status(400).json({
+        message: 'Quantity must be at least 1.'
+      })
+    }
+
+    const pharmacyExists = await Pharmacy.findById(pharmacy)
+
+    if (!pharmacyExists) {
+      return res.status(404).json({
+        message: 'Pharmacy not found.'
+      })
+    }
+
+    const inventory = await Inventory.findOne({
+      pharmacy: pharmacy,
+      medicine: medicine
+    })
+
+    if (!inventory) {
+      return res.status(404).json({
+        message: 'Medicine is not available at this pharmacy.'
+      })
+    }
+
+    if (inventory.stock < quantity) {
+      return res.status(400).json({
+        message: `Only ${inventory.stock} item(s) available.`
       })
     }
 
@@ -49,8 +82,19 @@ async function getMyReservations(req, res) {
 
 async function getPharmacyReservations(req, res) {
   try {
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found for this user.'
+      })
+    }
+
     const reservations = await Reservation.find({
-      pharmacy: req.user._id
+      pharmacy: pharmacy._id
     })
       .populate('user')
       .populate('medicine')
@@ -70,9 +114,25 @@ async function updateReservationStatus(req, res) {
   try {
     const { status } = req.body
 
+    if (!status) {
+      return res.status(400).json({
+        message: 'Status is required.'
+      })
+    }
+
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found for this user.'
+      })
+    }
+
     const reservation = await Reservation.findOne({
       _id: req.params.id,
-      pharmacy: req.user._id
+      pharmacy: pharmacy._id
     })
 
     if (!reservation) {

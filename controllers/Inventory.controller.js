@@ -3,7 +3,7 @@ const Pharmacy = require('../models/Pharmacy')
 
 async function addMedicine(req, res) {
   try {
-    const { medicine } = req.body
+    const { medicine, stock } = req.body
 
     if (!medicine) {
       return res.status(400).json({
