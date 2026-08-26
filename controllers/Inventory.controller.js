@@ -1,4 +1,5 @@
 const Inventory = require('../models/Inventory')
+const Pharmacy = require('../models/Pharmacy')
 
 async function addMedicine(req, res) {
   try {
@@ -10,8 +11,18 @@ async function addMedicine(req, res) {
       })
     }
 
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found.'
+      })
+    }
+
     const inventory = await Inventory.create({
-      pharmacy: req.user._id,
+      pharmacy: pharmacy._id,
       medicine
     })
 
@@ -27,8 +38,18 @@ async function addMedicine(req, res) {
 
 async function getMyInventory(req, res) {
   try {
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found.'
+      })
+    }
+
     const inventory = await Inventory.find({
-      pharmacy: req.user._id
+      pharmacy: pharmacy._id
     }).populate('medicine')
 
     return res.status(200).json(inventory)
@@ -43,9 +64,19 @@ async function getMyInventory(req, res) {
 
 async function deleteMedicine(req, res) {
   try {
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found.'
+      })
+    }
+
     const inventory = await Inventory.findOneAndDelete({
       _id: req.params.id,
-      pharmacy: req.user._id
+      pharmacy: pharmacy._id
     })
 
     if (!inventory) {
