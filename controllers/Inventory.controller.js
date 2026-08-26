@@ -1,8 +1,9 @@
 const Inventory = require('../models/Inventory')
+const Pharmacy = require('../models/Pharmacy')
 
 async function addMedicine(req, res) {
   try {
-    const { medicine } = req.body
+    const { medicine, stock } = req.body
 
     if (!medicine) {
       return res.status(400).json({
@@ -10,9 +11,32 @@ async function addMedicine(req, res) {
       })
     }
 
+    if (stock === undefined) {
+      return res.status(400).json({
+        message: 'Stock is required.'
+      })
+    }
+
+    if (stock < 0) {
+      return res.status(400).json({
+        message: 'Stock cannot be negative.'
+      })
+    }
+
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found for this user.'
+      })
+    }
+
     const inventory = await Inventory.create({
-      pharmacy: req.user._id,
-      medicine
+      pharmacy: pharmacy._id,
+      medicine,
+      stock
     })
 
     return res.status(201).json(inventory)
@@ -27,8 +51,18 @@ async function addMedicine(req, res) {
 
 async function getMyInventory(req, res) {
   try {
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found for this user.'
+      })
+    }
+
     const inventory = await Inventory.find({
-      pharmacy: req.user._id
+      pharmacy: pharmacy._id
     }).populate('medicine')
 
     return res.status(200).json(inventory)
@@ -43,9 +77,19 @@ async function getMyInventory(req, res) {
 
 async function deleteMedicine(req, res) {
   try {
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found for this user.'
+      })
+    }
+
     const inventory = await Inventory.findOneAndDelete({
       _id: req.params.id,
-      pharmacy: req.user._id
+      pharmacy: pharmacy._id
     })
 
     if (!inventory) {
