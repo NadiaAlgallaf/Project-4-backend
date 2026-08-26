@@ -11,32 +11,19 @@ async function addMedicine(req, res) {
       })
     }
 
-    if (stock === undefined) {
-      return res.status(400).json({
-        message: 'Stock is required.'
-      })
-    }
-
-    if (stock < 0) {
-      return res.status(400).json({
-        message: 'Stock cannot be negative.'
-      })
-    }
-
     const pharmacy = await Pharmacy.findOne({
       owner: req.user._id
     })
 
     if (!pharmacy) {
       return res.status(404).json({
-        message: 'Pharmacy not found for this user.'
+        message: 'Pharmacy not found.'
       })
     }
 
     const inventory = await Inventory.create({
       pharmacy: pharmacy._id,
-      medicine,
-      stock
+      medicine
     })
 
     return res.status(201).json(inventory)
@@ -57,7 +44,7 @@ async function getMyInventory(req, res) {
 
     if (!pharmacy) {
       return res.status(404).json({
-        message: 'Pharmacy not found for this user.'
+        message: 'Pharmacy not found.'
       })
     }
 
@@ -83,7 +70,7 @@ async function deleteMedicine(req, res) {
 
     if (!pharmacy) {
       return res.status(404).json({
-        message: 'Pharmacy not found for this user.'
+        message: 'Pharmacy not found.'
       })
     }
 
