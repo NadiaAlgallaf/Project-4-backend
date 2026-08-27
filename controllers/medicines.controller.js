@@ -42,7 +42,7 @@ async function createMedicine(req, res) {
       category,
       price,
       requiresPrescription
-    } = req.body;
+    } = req.body
 
     if (
       !name ||
@@ -53,8 +53,14 @@ async function createMedicine(req, res) {
     ) {
       return res.status(400).json({
         message:
-          "Name, dosage, category, price, and prescription requirement are required.",
-      });
+          'Name, dosage, category, price, and prescription requirement are required.'
+      })
+    }
+
+    if (typeof requiresPrescription !== 'boolean') {
+      return res.status(400).json({
+        message: 'requiresPrescription must be true or false.'
+      })
     }
 
     const medicine = await Medicine.create({
@@ -62,22 +68,22 @@ async function createMedicine(req, res) {
       dosage,
       category,
       price,
-      requiresPrescription,
-    });
+      requiresPrescription
+    })
 
-    return res.status(201).json(medicine);
+    return res.status(201).json(medicine)
   } catch (err) {
-    console.error(err);
+    console.error(err)
 
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       return res.status(400).json({
-        message: err.message,
-      });
+        message: err.message
+      })
     }
 
     return res.status(500).json({
-      message: "Internal Server Error",
-    });
+      message: 'Internal Server Error'
+    })
   }
 }
 
@@ -101,6 +107,12 @@ async function updateMedicine(req, res) {
       return res.status(400).json({
         message:
           "Name, dosage, category, price, and prescription requirement are required.",
+      })
+    }
+
+    if (typeof requiresPrescription !== 'boolean') { 
+      return res.status(400).json({
+        message: 'requirePrescription must be true or false'
       })
     }
 
