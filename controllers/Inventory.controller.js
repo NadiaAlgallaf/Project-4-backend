@@ -5,9 +5,15 @@ async function addMedicine(req, res) {
   try {
     const { medicine, stock } = req.body
 
-    if (!medicine) {
+    if (!medicine || stock === undefined) {
       return res.status(400).json({
-        message: 'Medicine is required.'
+        message: 'Medicine and stock are required.'
+      })
+    }
+
+    if (stock < 0){
+      return res.status(400).json({
+        message: 'Stock cannot be negative. '
       })
     }
 
