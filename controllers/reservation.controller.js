@@ -198,6 +198,14 @@ async function cancelReservation(req, res) {
       })
     }
 
+    if (reservation.status !== 'Pending') { 
+      return res.status(400).json({
+        message: 'Only Pending reservations can be cancelled'
+      })
+    }
+
+    await reservation.deleteOne()
+
     return res.status(200).json({
       message: 'Reservation cancelled successfully.'
     })
