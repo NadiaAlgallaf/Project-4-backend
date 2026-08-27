@@ -141,10 +141,26 @@ async function updateReservationStatus(req, res) {
       })
     }
 
-    // Only decrease stock when approving a pending reservation
-    if (status === 'Approved' && reservation.status !== 'Approved') {
+    const allowedTransitions = { 
+      Pending:['Approved' , 'Rejected'], 
+      Approved: ['Ready'],
+      Ready: ['Collected'], 
+      Collected: [], 
+      Rejected: [] 
+    }
+
+    if (!allowedTransitions[reservation.status]?.includes(status)) {
+      return res.status(400).json({
+        message: `Cannot change reservation status from ${reservation.status} to ${status}.`
+      })
+    }
+
+
+
+    
+    if (status === 'Approved') {
       const inventory = await Inventory.findOne({
-        pharmacy: pharmacy._id,
+        pharmacy: reservation.pharmacy,
         medicine: reservation.medicine
       })
 
@@ -161,7 +177,6 @@ async function updateReservationStatus(req, res) {
       }
 
       inventory.stock -= reservation.quantity
-
       await inventory.save()
     }
 
