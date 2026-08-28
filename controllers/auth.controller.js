@@ -10,6 +10,7 @@ async function signUp(req, res) {
       lastName,
       email,
       password,
+      role
     } = req.body;
 
     // Validation
@@ -26,13 +27,19 @@ async function signUp(req, res) {
       });
     }
 
+    if (role && !["User", "Pharmacy"].includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role.",
+      });
+    }
+
     const user = await User.create({
       username,
       firstName,
       lastName,
       email,
       hashedPassword: await bcrypt.hash(password, 12),
-      role: "User",
+      role: role || "User",
     });
 
     const { _id, createdAt, updatedAt } = user;
