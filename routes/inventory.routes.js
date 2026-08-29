@@ -3,6 +3,7 @@ const router = express.Router()
 const {
   addMedicine,
   getMyInventory,
+  getMedicineAvailability,
   deleteMedicine
 } = require('../controllers/inventory.controller')
 const verifyToken = require('../middleware/verifyToken')
@@ -16,6 +17,8 @@ router.get(
   authorizeRole('Pharmacy'),
   getMyInventory
 )
+
+router.get('/medicine/:medicineId', getMedicineAvailability)
 
 router.delete('/:id', verifyToken, authorizeRole('Pharmacy'), deleteMedicine)
 
