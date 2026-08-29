@@ -5,7 +5,7 @@ const {
   getMyInventory,
   getMedicineAvailability,
   deleteMedicine
-} = require('../controllers/inventory.controller')
+} = require('../controllers/Inventory.controller')
 const verifyToken = require('../middleware/verifyToken')
 const authorizeRole = require('../middleware/authorizeRole')
 
