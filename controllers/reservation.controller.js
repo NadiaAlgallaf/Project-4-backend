@@ -86,7 +86,6 @@ async function getPharmacyReservations(req, res) {
       owner: req.user._id
     })
 
-
     if (!pharmacy) {
       return res.status(404).json({
         message: 'Pharmacy not found for this user.'
@@ -141,12 +140,12 @@ async function updateReservationStatus(req, res) {
       })
     }
 
-    const allowedTransitions = { 
-      Pending:['Approved' , 'Rejected'], 
+    const allowedTransitions = {
+      Pending: ['Approved', 'Rejected'],
       Approved: ['Ready'],
-      Ready: ['Collected'], 
-      Collected: [], 
-      Rejected: [] 
+      Ready: ['Collected'],
+      Collected: [],
+      Rejected: []
     }
 
     if (!allowedTransitions[reservation.status]?.includes(status)) {
@@ -155,9 +154,6 @@ async function updateReservationStatus(req, res) {
       })
     }
 
-
-
-    
     if (status === 'Approved') {
       const inventory = await Inventory.findOne({
         pharmacy: reservation.pharmacy,
@@ -202,7 +198,7 @@ async function updateReservationStatus(req, res) {
 
 async function cancelReservation(req, res) {
   try {
-    const reservation = await Reservation.findOneAndDelete({
+    const reservation = await Reservation.findOne({
       _id: req.params.id,
       user: req.user._id
     })
@@ -213,7 +209,7 @@ async function cancelReservation(req, res) {
       })
     }
 
-    if (reservation.status !== 'Pending') { 
+    if (reservation.status !== 'Pending') {
       return res.status(400).json({
         message: 'Only Pending reservations can be cancelled'
       })
