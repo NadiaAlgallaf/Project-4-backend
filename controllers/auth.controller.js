@@ -1,22 +1,45 @@
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
+const Pharmacy = require('../models/Pharmacy')
 const jwt = require('jsonwebtoken')
 
 async function signUp(req, res) {
   try {
-    const { username, firstName, lastName, email, password, role } = req.body
+    const {
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      role,
+      pharmacyName,
+      location,
+      phone
+    } = req.body
 
     // Validation
-    if (!username || !firstName || !lastName || !email || !password || !role) {
+    if (!username || !email || !password || !role) {
       return res.status(400).json({
-        message:
-          'Username, first name, last name, email, password, and role are required.'
+        message: 'Username, email, password, and role are required.'
       })
     }
 
     if (!['User', 'Pharmacy'].includes(role)) {
       return res.status(400).json({
         message: 'Invalid role.'
+      })
+    }
+
+    if (role === 'User' && (!firstName || !lastName)) {
+      return res.status(400).json({
+        message: 'First name and last name are required for users.'
+      })
+    }
+
+    if (role === 'Pharmacy' && (!pharmacyName || !location || !phone)) {
+      return res.status(400).json({
+        message:
+          'Pharmacy name, location, and phone are required for pharmacy accounts.'
       })
     }
 
@@ -34,6 +57,15 @@ async function signUp(req, res) {
       hashedPassword: await bcrypt.hash(password, 12),
       role
     })
+
+    if (role === 'Pharmacy') {
+      await Pharmacy.create({
+        name: pharmacyName,
+        location,
+        phone,
+        owner: user._id
+      })
+    }
 
     const { _id, createdAt, updatedAt } = user
 
