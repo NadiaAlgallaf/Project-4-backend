@@ -11,7 +11,7 @@ async function addMedicine(req, res) {
       })
     }
 
-    if (stock < 0){
+    if (stock < 0) {
       return res.status(400).json({
         message: 'Stock cannot be negative. '
       })
@@ -28,15 +28,15 @@ async function addMedicine(req, res) {
     }
 
     const existingInventory = await Inventory.findOne({
-  pharmacy: pharmacy._id,
-  medicine
-})
+      pharmacy: pharmacy._id,
+      medicine
+    })
 
-if (existingInventory) {
-  return res.status(409).json({
-    message: 'Medicine already exists in inventory.'
-  })
-}
+    if (existingInventory) {
+      return res.status(409).json({
+        message: 'Medicine already exists in inventory.'
+      })
+    }
     const inventory = await Inventory.create({
       pharmacy: pharmacy._id,
       medicine,
@@ -113,9 +113,28 @@ async function deleteMedicine(req, res) {
     })
   }
 }
+async function getMedicineAvailability(req, res) {
+  try {
+    const inventory = await Inventory.find({
+      medicine: req.params.medicineId,
+      stock: { $gt: 0 }
+    })
+      .populate('pharmacy')
+      .populate('medicine')
+
+    return res.status(200).json(inventory)
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
 
 module.exports = {
   addMedicine,
   getMyInventory,
-  deleteMedicine
+  deleteMedicine,
+  getMedicineAvailability
 }
