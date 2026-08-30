@@ -132,7 +132,7 @@ async function updateReservationStatus(req, res) {
     const reservation = await Reservation.findOne({
       _id: req.params.id,
       pharmacy: pharmacy._id
-    })
+    }).populate('medicine')
 
     if (!reservation) {
       return res.status(404).json({
@@ -154,10 +154,20 @@ async function updateReservationStatus(req, res) {
       })
     }
 
+    if (
+      status === 'Approved' &&
+      reservation.medicine.requiresPrescription &&
+      !reservation.prescription
+    ) {
+      return res.status(400).json({
+        message: 'Prescription is required before approving this reservation.'
+      })
+    }
+
     if (status === 'Approved') {
       const inventory = await Inventory.findOne({
         pharmacy: reservation.pharmacy,
-        medicine: reservation.medicine
+        medicine: reservation.medicine._id
       })
 
       if (!inventory) {
