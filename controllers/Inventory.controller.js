@@ -79,6 +79,53 @@ async function getMyInventory(req, res) {
   }
 }
 
+async function updateStock(req, res) {
+  try {
+    const { stock } = req.body
+
+    if (stock === undefined) {
+      return res.status(400).json({
+        message: 'Stock is required.'
+      })
+    }
+
+    if (stock < 0) {
+      return res.status(400).json({
+        message: 'Stock cannot be negative.'
+      })
+    }
+
+    const pharmacy = await Pharmacy.findOne({
+      owner: req.user._id
+    })
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found.'
+      })
+    }
+
+    const inventory = await Inventory.findOneAndUpdate(
+      { _id: req.params.id, pharmacy: pharmacy._id },
+      { stock },
+      { new: true }
+    ).populate('medicine')
+
+    if (!inventory) {
+      return res.status(404).json({
+        message: 'Medicine not found in inventory.'
+      })
+    }
+    return res.status(200).json(inventory)
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 async function deleteMedicine(req, res) {
   try {
     const pharmacy = await Pharmacy.findOne({
@@ -135,6 +182,7 @@ async function getMedicineAvailability(req, res) {
 module.exports = {
   addMedicine,
   getMyInventory,
+  updateStock,
   deleteMedicine,
   getMedicineAvailability
 }
