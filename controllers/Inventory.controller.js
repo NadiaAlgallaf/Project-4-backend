@@ -179,10 +179,36 @@ async function getMedicineAvailability(req, res) {
   }
 }
 
+async function getPharmacyInventory(req, res) {
+  try {
+    const pharmacy = await Pharmacy.findById(req.params.pharmacyId)
+
+    if (!pharmacy) {
+      return res.status(404).json({
+        message: 'Pharmacy not found.'
+      })
+    }
+
+    const inventory = await Inventory.find({
+      pharmacy: pharmacy._id,
+      stock: { $gt: 0 }
+    }).populate('medicine')
+
+    return res.status(200).json(inventory)
+  } catch (err) {
+    console.error(err)
+
+    return res.status(500).json({
+      message: 'Internal Server Error'
+    })
+  }
+}
+
 module.exports = {
   addMedicine,
   getMyInventory,
   updateStock,
   deleteMedicine,
-  getMedicineAvailability
+  getMedicineAvailability,
+  getPharmacyInventory
 }
