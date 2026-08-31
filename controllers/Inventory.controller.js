@@ -84,6 +84,12 @@ async function getMyInventory(req, res) {
 
 async function updateStock(req, res) {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+  return res.status(400).json({
+    message: 'Invalid inventory ID.'
+  })
+}
+
     const { stock } = req.body
 
     if (stock === undefined) {
