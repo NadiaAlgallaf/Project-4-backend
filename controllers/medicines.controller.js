@@ -1,16 +1,16 @@
-const Medicine = require("../models/Medicine");
+const Medicine = require('../models/Medicine')
 
 async function getAllMedicines(req, res) {
   try {
-    const medicines = await Medicine.find();
+    const medicines = await Medicine.find()
 
-    return res.status(200).json(medicines);
+    return res.status(200).json(medicines)
   } catch (err) {
-    console.error(err);
+    console.error(err)
 
     return res.status(500).json({
-      message: "Internal Server Error",
-    });
+      message: 'Internal Server Error'
+    })
   }
 }
 
@@ -20,7 +20,7 @@ async function getMedicineById(req, res) {
 
     if (!medicine) {
       return res.status(404).json({
-        message: "Medicine not found.",
+        message: 'Medicine not found.'
       })
     }
 
@@ -29,7 +29,7 @@ async function getMedicineById(req, res) {
     console.error(err)
 
     return res.status(500).json({
-      message: "Internal Server Error",
+      message: 'Internal Server Error'
     })
   }
 }
@@ -37,38 +37,45 @@ async function getMedicineById(req, res) {
 async function createMedicine(req, res) {
   try {
     const {
-      name,
+      genericName,
+      brandName,
       dosage,
+      dosageForm,
       category,
       price,
       requiresPrescription
     } = req.body
 
     if (
-      !name ||
+      !genericName ||
+      !brandName ||
       !dosage ||
+      !dosageForm ||
       !category ||
       price === undefined ||
       requiresPrescription === undefined
     ) {
       return res.status(400).json({
         message:
-          'Name, dosage, category, price, and prescription requirement are required.'
+          'Generic name, brand name, dosage, dosage form, category, price, and prescription requirement are required.'
       })
     }
 
-    if (typeof requiresPrescription !== 'boolean') {
+    if (requiresPrescription !== 'true' && requiresPrescription !== 'false') {
       return res.status(400).json({
         message: 'requiresPrescription must be true or false.'
       })
     }
 
     const medicine = await Medicine.create({
-      name,
+      genericName,
+      brandName,
       dosage,
+      dosageForm,
       category,
       price,
-      requiresPrescription
+      requiresPrescription: requiresPrescription === 'true',
+      medicineImg: req.file ? `/uploads/medicines/${req.file.filename}` : ''
     })
 
     return res.status(201).json(medicine)
@@ -90,41 +97,53 @@ async function createMedicine(req, res) {
 async function updateMedicine(req, res) {
   try {
     const {
-      name,
+      genericName,
+      brandName,
       dosage,
+      dosageForm,
       category,
       price,
       requiresPrescription
     } = req.body
 
     if (
-      !name ||
+      !genericName ||
+      !brandName ||
       !dosage ||
+      !dosageForm ||
       !category ||
       price === undefined ||
       requiresPrescription === undefined
     ) {
       return res.status(400).json({
         message:
-          "Name, dosage, category, price, and prescription requirement are required.",
+          'Generic name, brand name, dosage, dosage form, category, price, and prescription requirement are required.'
       })
     }
 
-    if (typeof requiresPrescription !== 'boolean') { 
+    if (requiresPrescription !== 'true' && requiresPrescription !== 'false') {
       return res.status(400).json({
-        message: 'requirePrescription must be true or false'
+        message: 'requiresPrescription must be true or false.'
       })
+    }
+
+    const updateData = {
+      genericName,
+      brandName,
+      dosage,
+      dosageForm,
+      category,
+      price,
+      requiresPrescription: requiresPrescription === 'true'
+    }
+
+    if (req.file) {
+      updateData.medicineImg = `/uploads/medicines/${req.file.filename}`
     }
 
     const medicine = await Medicine.findByIdAndUpdate(
       req.params.id,
-      {
-        name,
-        dosage,
-        category,
-        price,
-        requiresPrescription
-      },
+      updateData,
       {
         new: true,
         runValidators: true
@@ -133,7 +152,7 @@ async function updateMedicine(req, res) {
 
     if (!medicine) {
       return res.status(404).json({
-        message: "Medicine not found."
+        message: 'Medicine not found.'
       })
     }
 
@@ -141,14 +160,14 @@ async function updateMedicine(req, res) {
   } catch (err) {
     console.error(err)
 
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       return res.status(400).json({
         message: err.message
       })
     }
 
     return res.status(500).json({
-      message: "Internal Server Error"
+      message: 'Internal Server Error'
     })
   }
 }
@@ -159,26 +178,26 @@ async function deleteMedicine(req, res) {
 
     if (!medicine) {
       return res.status(404).json({
-        message: "Medicine not found."
+        message: 'Medicine not found.'
       })
     }
 
     return res.status(200).json({
-      message: "Medicine deleted successfully."
+      message: 'Medicine deleted successfully.'
     })
   } catch (err) {
     console.error(err)
 
     return res.status(500).json({
-      message: "Internal Server Error"
+      message: 'Internal Server Error'
     })
   }
 }
 
 module.exports = {
   getAllMedicines,
-   getMedicineById,
+  getMedicineById,
   createMedicine,
   updateMedicine,
-  deleteMedicine,
+  deleteMedicine
 }

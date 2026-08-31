@@ -2,13 +2,25 @@ const mongoose = require('mongoose')
 
 const medicineSchema = new mongoose.Schema(
   {
-    name: {
+    genericName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+
+    brandName: {
       type: String,
       required: true,
       trim: true
     },
 
     dosage: {
+      type: String,
+      required: true,
+      trim: true
+    },
+
+    dosageForm: {
       type: String,
       required: true,
       trim: true
@@ -24,6 +36,11 @@ const medicineSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0
+    },
+
+    medicineImg: {
+      type: String,
+      trim: true
     },
 
     requiresPrescription: {
