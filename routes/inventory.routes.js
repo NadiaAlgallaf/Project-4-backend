@@ -4,6 +4,7 @@ const {
   addMedicine,
   getMyInventory,
   getMedicineAvailability,
+  getPharmacyInventory,
   deleteMedicine,
   updateStock
 } = require('../controllers/Inventory.controller')
@@ -20,6 +21,8 @@ router.get(
 )
 
 router.get('/medicine/:medicineId', getMedicineAvailability)
+
+router.get('/pharmacy/:pharmacyId', getPharmacyInventory)
 
 router.patch('/:id', verifyToken, authorizeRole('Pharmacy'), updateStock)
 
