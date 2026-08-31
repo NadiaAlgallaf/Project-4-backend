@@ -30,6 +30,11 @@ const pharmacySchema = new mongoose.Schema(
       trim: true
     },
 
+    pharmacyImg: {
+      type: String,
+      trim: true
+    },
+
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

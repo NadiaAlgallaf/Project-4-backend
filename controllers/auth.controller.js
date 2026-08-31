@@ -19,7 +19,6 @@ async function signUp(req, res) {
       longitude
     } = req.body
 
-    // Validation
     if (!username || !email || !password || !role) {
       return res.status(400).json({
         message: 'Username, email, password, and role are required.'
@@ -74,6 +73,7 @@ async function signUp(req, res) {
         phone,
         latitude,
         longitude,
+        pharmacyImg: req.file ? `/uploads/pharmacies/${req.file.filename}` : '',
         owner: user._id
       })
     }

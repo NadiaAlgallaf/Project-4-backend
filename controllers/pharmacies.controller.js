@@ -1,16 +1,16 @@
-const Pharmacy = require("../models/Pharmacy");
+const Pharmacy = require('../models/Pharmacy')
 
 async function getAllPharmacies(req, res) {
   try {
-    const pharmacies = await Pharmacy.find();
+    const pharmacies = await Pharmacy.find()
 
-    return res.status(200).json(pharmacies);
+    return res.status(200).json(pharmacies)
   } catch (err) {
-    console.error(err);
+    console.error(err)
 
     return res.status(500).json({
-      message: "Internal Server Error",
-    });
+      message: 'Internal Server Error'
+    })
   }
 }
 
@@ -20,7 +20,7 @@ async function getPharmacyById(req, res) {
 
     if (!pharmacy) {
       return res.status(404).json({
-        message: "Pharmacy not found.",
+        message: 'Pharmacy not found.'
       })
     }
 
@@ -29,45 +29,44 @@ async function getPharmacyById(req, res) {
     console.error(err)
 
     return res.status(500).json({
-      message: "Internal Server Error",
+      message: 'Internal Server Error'
     })
   }
 }
 
 async function createPharmacy(req, res) {
   try {
-    const { name, location, phone } = req.body;
+    const { name, location, phone } = req.body
 
-    // Validation
     if (!name || !location || !phone) {
       return res.status(400).json({
-        message: "Name, location, and phone are required.",
-      });
+        message: 'Name, location, and phone are required.'
+      })
     }
 
     const pharmacy = await Pharmacy.create({
       name,
       location,
       phone,
-      owner: req.user._id,
-    });
+      pharmacyImg: req.file ? `/uploads/pharmacies/${req.file.filename}` : '',
+      owner: req.user._id
+    })
 
-    return res.status(201).json(pharmacy);
+    return res.status(201).json(pharmacy)
   } catch (err) {
-    console.error(err);
+    console.error(err)
 
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       return res.status(400).json({
-        message: err.message,
-      });
+        message: err.message
+      })
     }
 
     return res.status(500).json({
-      message: "Internal Server Error",
-    });
+      message: 'Internal Server Error'
+    })
   }
 }
-
 
 async function updatePharmacy(req, res) {
   try {
@@ -75,29 +74,35 @@ async function updatePharmacy(req, res) {
 
     if (!name || !location || !phone) {
       return res.status(400).json({
-        message: "Name, location, and phone are required.",
+        message: 'Name, location, and phone are required.'
       })
+    }
+
+    const updateData = {
+      name,
+      location,
+      phone
+    }
+
+    if (req.file) {
+      updateData.pharmacyImg = `/uploads/pharmacies/${req.file.filename}`
     }
 
     const pharmacy = await Pharmacy.findOneAndUpdate(
       {
         _id: req.params.id,
-        owner: req.user._id,
+        owner: req.user._id
       },
-      {
-        name,
-        location,
-        phone,
-      },
+      updateData,
       {
         new: true,
-        runValidators: true,
+        runValidators: true
       }
     )
 
     if (!pharmacy) {
       return res.status(404).json({
-        message: "Pharmacy not found.",
+        message: 'Pharmacy not found.'
       })
     }
 
@@ -105,39 +110,39 @@ async function updatePharmacy(req, res) {
   } catch (err) {
     console.error(err)
 
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       return res.status(400).json({
-        message: err.message,
+        message: err.message
       })
     }
 
     return res.status(500).json({
-      message: "Internal Server Error",
+      message: 'Internal Server Error'
     })
   }
-} 
+}
 
 async function deletePharmacy(req, res) {
   try {
     const pharmacy = await Pharmacy.findOneAndDelete({
       _id: req.params.id,
-      owner: req.user._id,
+      owner: req.user._id
     })
 
     if (!pharmacy) {
       return res.status(404).json({
-        message: "Pharmacy not found.",
+        message: 'Pharmacy not found.'
       })
     }
 
     return res.status(200).json({
-      message: "Pharmacy deleted successfully.",
+      message: 'Pharmacy deleted successfully.'
     })
   } catch (err) {
     console.error(err)
 
     return res.status(500).json({
-      message: "Internal Server Error",
+      message: 'Internal Server Error'
     })
   }
 }
@@ -147,5 +152,5 @@ module.exports = {
   getPharmacyById,
   createPharmacy,
   updatePharmacy,
- deletePharmacy,
+  deletePharmacy
 }
