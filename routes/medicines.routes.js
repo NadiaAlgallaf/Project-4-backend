@@ -1,13 +1,36 @@
-const router = require("express").Router();
-const authorizeRole = require("../middleware/authorizeRole")
+const router = require('express').Router()
 
-const verifyToken = require("../middleware/verifyToken");
-const medicinesController = require("../controllers/medicines.controller");
+const authorizeRole = require('../middleware/authorizeRole')
+const verifyToken = require('../middleware/verifyToken')
+const uploadImage = require('../middleware/uploadImage')
 
-router.get("/", medicinesController.getAllMedicines)
-router.get("/:id", medicinesController.getMedicineById)
-router.post("/", verifyToken,authorizeRole("Pharmacy"), medicinesController.createMedicine)
-router.patch("/:id", verifyToken,authorizeRole("Pharmacy"),medicinesController.updateMedicine)
-router.delete("/:id",verifyToken,authorizeRole("Pharmacy"),medicinesController.deleteMedicine)
+const medicinesController = require('../controllers/medicines.controller')
 
-module.exports = router;
+router.get('/', medicinesController.getAllMedicines)
+
+router.get('/:id', medicinesController.getMedicineById)
+
+router.post(
+  '/',
+  verifyToken,
+  authorizeRole('Pharmacy'),
+  uploadImage('medicines').single('medicineImg'),
+  medicinesController.createMedicine
+)
+
+router.patch(
+  '/:id',
+  verifyToken,
+  authorizeRole('Pharmacy'),
+  uploadImage('medicines').single('medicineImg'),
+  medicinesController.updateMedicine
+)
+
+router.delete(
+  '/:id',
+  verifyToken,
+  authorizeRole('Pharmacy'),
+  medicinesController.deleteMedicine
+)
+
+module.exports = router
