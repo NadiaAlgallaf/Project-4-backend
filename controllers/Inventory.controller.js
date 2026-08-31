@@ -11,11 +11,12 @@ async function addMedicine(req, res) {
       })
     }
 
-    if (stock < 0) {
-      return res.status(400).json({
-        message: 'Stock cannot be negative. '
-      })
-    }
+   if (!Number.isInteger(stock) || stock < 0) {
+  return res.status(400).json({
+    message: 'Stock must be a non-negative integer.'
+  })
+}
+
 
     const pharmacy = await Pharmacy.findOne({
       owner: req.user._id
@@ -89,11 +90,11 @@ async function updateStock(req, res) {
       })
     }
 
-    if (stock < 0) {
-      return res.status(400).json({
-        message: 'Stock cannot be negative.'
-      })
-    }
+    if (!Number.isInteger(stock) || stock < 0) {
+  return res.status(400).json({
+    message: 'Stock must be a non-negative integer.'
+  })
+}
 
     const pharmacy = await Pharmacy.findOne({
       owner: req.user._id
