@@ -195,6 +195,12 @@ async function getMedicineAvailability(req, res) {
 
 async function getPharmacyInventory(req, res) {
   try {
+
+     if (!mongoose.Types.ObjectId.isValid(req.params.pharmacyId)) {
+      return res.status(400).json({
+        message: 'Invalid pharmacy ID.'
+      })
+    }
     const pharmacy = await Pharmacy.findById(req.params.pharmacyId)
 
     if (!pharmacy) {
