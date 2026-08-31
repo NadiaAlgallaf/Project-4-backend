@@ -8,7 +8,7 @@ const prescriptionSchema = new mongoose.Schema(
       required: true
     },
 
-    imageUrl: {
+    prescriptionImg: {
       type: String,
       required: true,
       trim: true

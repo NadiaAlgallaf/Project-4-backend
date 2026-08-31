@@ -10,6 +10,7 @@ const {
 } = require('../controllers/reservation.controller')
 const verifyToken = require('../middleware/verifyToken')
 const authorizeRole = require('../middleware/authorizeRole')
+const upload = require('../middleware/uploadPrescription')
 
 router.post('/', verifyToken, authorizeRole('User'), createReservation)
 
@@ -40,6 +41,7 @@ router.post(
   '/:id/prescription',
   verifyToken,
   authorizeRole('User'),
+  upload.single('prescription'),
   uploadPrescription
 )
 

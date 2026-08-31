@@ -21,7 +21,11 @@ app.use(
     origin: process.env.CLIENT_URL || 'http://localhost:5173'
   })
 )
+
 app.use(express.json())
+
+app.use('/uploads', express.static('uploads'))
+
 app.use(morgan('dev'))
 
 // Routes
