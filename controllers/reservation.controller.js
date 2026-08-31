@@ -260,8 +260,9 @@ async function uploadPrescription(req, res) {
 
     const prescription = await Prescription.create({
       user: req.user._id,
-      prescriptionImg: req.file.path,
-      uploadDate: new Date()
+      prescriptionImg: `/uploads/prescriptions/${req.file.filename}`,
+      uploadDate: new Date(),
+      reservation: reservation._id
     })
 
     reservation.prescription = prescription._id
