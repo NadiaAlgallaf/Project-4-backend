@@ -241,9 +241,7 @@ async function cancelReservation(req, res) {
 
 async function uploadPrescription(req, res) {
   try {
-    const { imageUrl } = req.body
-
-    if (!imageUrl) {
+    if (!req.file) {
       return res.status(400).json({
         message: 'Prescription image is required.'
       })
@@ -262,7 +260,7 @@ async function uploadPrescription(req, res) {
 
     const prescription = await Prescription.create({
       user: req.user._id,
-      imageUrl,
+      prescriptionImg: req.file.path,
       uploadDate: new Date()
     })
 
