@@ -23,7 +23,10 @@ const inventorySchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
-
+inventorySchema.index(
+  { pharmacy: 1, medicine: 1 },
+  { unique: true }
+)
 const Inventory = mongoose.model('Inventory', inventorySchema)
 
 module.exports = Inventory
