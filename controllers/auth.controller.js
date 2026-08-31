@@ -14,7 +14,9 @@ async function signUp(req, res) {
       role,
       pharmacyName,
       location,
-      phone
+      phone,
+      latitude,
+      longitude
     } = req.body
 
     // Validation
@@ -36,10 +38,17 @@ async function signUp(req, res) {
       })
     }
 
-    if (role === 'Pharmacy' && (!pharmacyName || !location || !phone)) {
+    if (
+      role === 'Pharmacy' &&
+      (!pharmacyName ||
+        !location ||
+        !phone ||
+        latitude === undefined ||
+        longitude === undefined)
+    ) {
       return res.status(400).json({
         message:
-          'Pharmacy name, location, and phone are required for pharmacy accounts.'
+          'Pharmacy name, phone, location and map location are required for pharmacy accounts.'
       })
     }
 
@@ -63,6 +72,8 @@ async function signUp(req, res) {
         name: pharmacyName,
         location,
         phone,
+        latitude,
+        longitude,
         owner: user._id
       })
     }
