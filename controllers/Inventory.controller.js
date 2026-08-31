@@ -1,5 +1,7 @@
 const Inventory = require('../models/Inventory')
 const Pharmacy = require('../models/Pharmacy')
+const mongoose = require('mongoose')
+
 
 async function addMedicine(req, res) {
   try {
@@ -11,11 +13,12 @@ async function addMedicine(req, res) {
       })
     }
 
-    if (stock < 0) {
-      return res.status(400).json({
-        message: 'Stock cannot be negative. '
-      })
-    }
+   if (!Number.isInteger(stock) || stock < 0) {
+  return res.status(400).json({
+    message: 'Stock must be a non-negative integer.'
+  })
+}
+
 
     const pharmacy = await Pharmacy.findOne({
       owner: req.user._id
@@ -81,6 +84,12 @@ async function getMyInventory(req, res) {
 
 async function updateStock(req, res) {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+  return res.status(400).json({
+    message: 'Invalid inventory ID.'
+  })
+}
+
     const { stock } = req.body
 
     if (stock === undefined) {
@@ -89,11 +98,11 @@ async function updateStock(req, res) {
       })
     }
 
-    if (stock < 0) {
-      return res.status(400).json({
-        message: 'Stock cannot be negative.'
-      })
-    }
+    if (!Number.isInteger(stock) || stock < 0) {
+  return res.status(400).json({
+    message: 'Stock must be a non-negative integer.'
+  })
+}
 
     const pharmacy = await Pharmacy.findOne({
       owner: req.user._id
@@ -162,6 +171,11 @@ async function deleteMedicine(req, res) {
 }
 async function getMedicineAvailability(req, res) {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.medicineId)) {
+      return res.status(400).json({
+        message: 'Invalid medicine ID.'
+      })
+    }
     const inventory = await Inventory.find({
       medicine: req.params.medicineId,
       stock: { $gt: 0 }
