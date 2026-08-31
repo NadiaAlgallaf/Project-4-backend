@@ -14,6 +14,16 @@ const pharmacySchema = new mongoose.Schema(
       trim: true
     },
 
+    latitude: {
+      type: Number,
+      required: true
+    },
+
+    longitude: {
+      type: Number,
+      required: true
+    },
+
     phone: {
       type: String,
       required: true,
