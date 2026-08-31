@@ -1,5 +1,7 @@
 const Inventory = require('../models/Inventory')
 const Pharmacy = require('../models/Pharmacy')
+const mongoose = require('mongoose')
+
 
 async function addMedicine(req, res) {
   try {
@@ -163,6 +165,11 @@ async function deleteMedicine(req, res) {
 }
 async function getMedicineAvailability(req, res) {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.medicineId)) {
+      return res.status(400).json({
+        message: 'Invalid medicine ID.'
+      })
+    }
     const inventory = await Inventory.find({
       medicine: req.params.medicineId,
       stock: { $gt: 0 }
