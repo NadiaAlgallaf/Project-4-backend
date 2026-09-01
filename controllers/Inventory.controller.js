@@ -2,6 +2,12 @@ const Inventory = require('../models/Inventory')
 const Pharmacy = require('../models/Pharmacy')
 const mongoose = require('mongoose')
 
+// Determine stock status based on quantity
+function getStockStatus(stock) {
+  if (stock === 0) return 'Out of Stock'
+  if (stock < 5) return 'Low Stock'
+  return 'In Stock'
+}
 
 async function addMedicine(req, res) {
   try {
@@ -13,12 +19,11 @@ async function addMedicine(req, res) {
       })
     }
 
-   if (!Number.isInteger(stock) || stock < 0) {
-  return res.status(400).json({
-    message: 'Stock must be a non-negative integer.'
-  })
-}
-
+    if (!Number.isInteger(stock) || stock < 0) {
+      return res.status(400).json({
+        message: 'Stock must be a non-negative integer.'
+      })
+    }
 
     const pharmacy = await Pharmacy.findOne({
       owner: req.user._id
@@ -40,13 +45,17 @@ async function addMedicine(req, res) {
         message: 'Medicine already exists in inventory.'
       })
     }
+
     const inventory = await Inventory.create({
       pharmacy: pharmacy._id,
       medicine,
       stock
     })
 
-    return res.status(201).json(inventory)
+    return res.status(201).json({
+      ...inventory.toObject(),
+      stockStatus: getStockStatus(inventory.stock)
+    })
   } catch (err) {
     console.error(err)
 
@@ -72,7 +81,12 @@ async function getMyInventory(req, res) {
       pharmacy: pharmacy._id
     }).populate('medicine')
 
-    return res.status(200).json(inventory)
+    const inventoryWithStatus = inventory.map(item => ({
+      ...item.toObject(),
+      stockStatus: getStockStatus(item.stock)
+    }))
+
+    return res.status(200).json(inventoryWithStatus)
   } catch (err) {
     console.error(err)
 
@@ -85,10 +99,10 @@ async function getMyInventory(req, res) {
 async function updateStock(req, res) {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-  return res.status(400).json({
-    message: 'Invalid inventory ID.'
-  })
-}
+      return res.status(400).json({
+        message: 'Invalid inventory ID.'
+      })
+    }
 
     const { stock } = req.body
 
@@ -99,10 +113,10 @@ async function updateStock(req, res) {
     }
 
     if (!Number.isInteger(stock) || stock < 0) {
-  return res.status(400).json({
-    message: 'Stock must be a non-negative integer.'
-  })
-}
+      return res.status(400).json({
+        message: 'Stock must be a non-negative integer.'
+      })
+    }
 
     const pharmacy = await Pharmacy.findOne({
       owner: req.user._id
@@ -115,7 +129,10 @@ async function updateStock(req, res) {
     }
 
     const inventory = await Inventory.findOneAndUpdate(
-      { _id: req.params.id, pharmacy: pharmacy._id },
+      {
+        _id: req.params.id,
+        pharmacy: pharmacy._id
+      },
       { stock },
       { new: true }
     ).populate('medicine')
@@ -125,7 +142,11 @@ async function updateStock(req, res) {
         message: 'Medicine not found in inventory.'
       })
     }
-    return res.status(200).json(inventory)
+
+    return res.status(200).json({
+      ...inventory.toObject(),
+      stockStatus: getStockStatus(inventory.stock)
+    })
   } catch (err) {
     console.error(err)
 
@@ -169,6 +190,7 @@ async function deleteMedicine(req, res) {
     })
   }
 }
+
 async function getMedicineAvailability(req, res) {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.medicineId)) {
@@ -176,6 +198,7 @@ async function getMedicineAvailability(req, res) {
         message: 'Invalid medicine ID.'
       })
     }
+
     const inventory = await Inventory.find({
       medicine: req.params.medicineId,
       stock: { $gt: 0 }
@@ -183,7 +206,12 @@ async function getMedicineAvailability(req, res) {
       .populate('pharmacy')
       .populate('medicine')
 
-    return res.status(200).json(inventory)
+    const inventoryWithStatus = inventory.map(item => ({
+      ...item.toObject(),
+      stockStatus: getStockStatus(item.stock)
+    }))
+
+    return res.status(200).json(inventoryWithStatus)
   } catch (err) {
     console.error(err)
 
@@ -195,12 +223,12 @@ async function getMedicineAvailability(req, res) {
 
 async function getPharmacyInventory(req, res) {
   try {
-
-     if (!mongoose.Types.ObjectId.isValid(req.params.pharmacyId)) {
+    if (!mongoose.Types.ObjectId.isValid(req.params.pharmacyId)) {
       return res.status(400).json({
         message: 'Invalid pharmacy ID.'
       })
     }
+
     const pharmacy = await Pharmacy.findById(req.params.pharmacyId)
 
     if (!pharmacy) {
@@ -214,7 +242,12 @@ async function getPharmacyInventory(req, res) {
       stock: { $gt: 0 }
     }).populate('medicine')
 
-    return res.status(200).json(inventory)
+    const inventoryWithStatus = inventory.map(item => ({
+      ...item.toObject(),
+      stockStatus: getStockStatus(item.stock)
+    }))
+
+    return res.status(200).json(inventoryWithStatus)
   } catch (err) {
     console.error(err)
 
